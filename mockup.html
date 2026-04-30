@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DNS Auth Inspector Mockup</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="stage" aria-label="Extension mockup preview">
+    <section class="browser-shell" aria-label="Fake browser window">
+      <div class="browser-topbar">
+        <div class="window-controls" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="address-bar">https://www.example.com/products</div>
+        <button class="toolbar-button" id="extensionButton" type="button" aria-label="Open DNS record inspector">
+          DNS
+        </button>
+      </div>
+
+      <div class="page-surface">
+        <div class="site-line"></div>
+        <div class="site-grid">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
+
+      <aside class="popup" id="popup" aria-label="DNS record inspector popup">
+        <header class="popup-header">
+          <div>
+            <p class="eyebrow">Current site</p>
+            <h1 id="domainTitle">example.com</h1>
+          </div>
+          <div class="header-actions">
+            <button class="icon-button" id="refreshButton" type="button" aria-label="Refresh records">↻</button>
+            <button class="primary-button" id="copyButton" type="button">Copy</button>
+          </div>
+        </header>
+
+        <div class="mode-row" aria-label="Lookup mode">
+          <button class="mode-button active" id="rootMode" type="button">Root domain</button>
+          <button class="mode-button" id="hostMode" type="button">Current hostname</button>
+        </div>
+
+        <div class="status-strip" id="statusStrip" role="status">Records checked through Cloudflare DNS over HTTPS</div>
+
+        <section class="record-section" aria-labelledby="spfTitle">
+          <div class="section-heading">
+            <h2 id="spfTitle">SPF</h2>
+            <span class="status-label found">Found</span>
+          </div>
+          <pre class="record-text">v=spf1 include:_spf.example.net include:mail.example.com -all</pre>
+          <dl class="facts-grid">
+            <div><dt>TXT name</dt><dd id="spfName">example.com</dd></div>
+            <div><dt>All mechanism</dt><dd>-all</dd></div>
+            <div><dt>Records found</dt><dd>1</dd></div>
+          </dl>
+        </section>
+
+        <section class="record-section" aria-labelledby="dmarcTitle">
+          <div class="section-heading">
+            <h2 id="dmarcTitle">DMARC</h2>
+            <span class="status-label found">Found</span>
+          </div>
+          <pre class="record-text">v=DMARC1; p=reject; rua=mailto:dmarc@example.com; adkim=s; aspf=r; pct=100</pre>
+          <dl class="facts-grid">
+            <div><dt>Policy</dt><dd>p=reject</dd></div>
+            <div><dt>Alignment</dt><dd>adkim=s, aspf=r</dd></div>
+            <div><dt>Reports</dt><dd>rua present</dd></div>
+          </dl>
+        </section>
+
+        <section class="record-section" aria-labelledby="dkimTitle">
+          <div class="section-heading">
+            <h2 id="dkimTitle">DKIM</h2>
+            <span class="status-label found" id="dkimStatus">2 found</span>
+          </div>
+
+          <div class="selector-list" id="selectorList" aria-label="Selectors checked">
+            <button class="selector active" type="button" data-selector="google">google</button>
+            <button class="selector active" type="button" data-selector="selector1">selector1</button>
+            <button class="selector" type="button" data-selector="default">default</button>
+            <button class="selector" type="button" data-selector="mail">mail</button>
+            <button class="selector" type="button" data-selector="sendgrid">sendgrid</button>
+          </div>
+
+          <div class="dkim-records" id="dkimRecords">
+            <article>
+              <div class="record-minihead">google._domainkey.example.com</div>
+              <pre class="record-text compact">v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A...</pre>
+            </article>
+            <article>
+              <div class="record-minihead">selector1._domainkey.example.com</div>
+              <pre class="record-text compact">v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQ...</pre>
+            </article>
+          </div>
+
+          <form class="selector-form" id="selectorForm">
+            <label for="selectorInput">Add selector</label>
+            <div>
+              <input id="selectorInput" name="selector" type="text" placeholder="for example: k2">
+              <button class="secondary-button" type="submit">Check</button>
+            </div>
+          </form>
+        </section>
+
+        <footer class="popup-footer">
+          <span id="timestamp">Checked 2026-04-30 14:22</span>
+          <span id="copyState" aria-live="polite"></span>
+        </footer>
+      </aside>
+    </section>
+  </main>
+
+  <script src="mockup.js"></script>
+</body>
+</html>

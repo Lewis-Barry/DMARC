@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DNS Auth Inspector</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="popup" aria-label="DNS record inspector popup">
+    <header class="popup-header">
+      <div>
+        <p class="eyebrow">Current site</p>
+        <h1 id="domainTitle">Loading...</h1>
+      </div>
+      <div class="header-actions">
+        <button class="icon-button" id="refreshButton" type="button" aria-label="Refresh records">R</button>
+        <button class="primary-button" id="copyButton" type="button">Copy</button>
+      </div>
+    </header>
+
+    <div class="mode-row" aria-label="Lookup mode">
+      <button class="mode-button active" id="rootMode" type="button">Root domain</button>
+      <button class="mode-button" id="hostMode" type="button">Current hostname</button>
+    </div>
+
+    <div class="status-strip" id="statusStrip" role="status">Loading current tab...</div>
+
+    <section class="record-section" aria-labelledby="spfTitle">
+      <div class="section-heading">
+        <h2 id="spfTitle">SPF</h2>
+        <span class="status-label neutral" id="spfStatus">Pending</span>
+      </div>
+      <pre class="record-text" id="spfRecord">Checking TXT records...</pre>
+      <dl class="facts-grid">
+        <div><dt>TXT name</dt><dd id="spfName">Loading...</dd></div>
+        <div><dt>All mechanism</dt><dd id="spfAll">Pending</dd></div>
+        <div><dt>Records found</dt><dd id="spfCount">Pending</dd></div>
+      </dl>
+    </section>
+
+    <section class="record-section" aria-labelledby="dmarcTitle">
+      <div class="section-heading">
+        <h2 id="dmarcTitle">DMARC</h2>
+        <span class="status-label neutral" id="dmarcStatus">Pending</span>
+      </div>
+      <pre class="record-text" id="dmarcRecord">Checking TXT records...</pre>
+      <dl class="facts-grid">
+        <div><dt>Policy</dt><dd id="dmarcPolicy">Pending</dd></div>
+        <div><dt>Alignment</dt><dd id="dmarcAlignment">Pending</dd></div>
+        <div><dt>Reports</dt><dd id="dmarcReports">Pending</dd></div>
+      </dl>
+    </section>
+
+    <section class="record-section" aria-labelledby="dkimTitle">
+      <div class="section-heading">
+        <h2 id="dkimTitle">DKIM</h2>
+        <span class="status-label neutral" id="dkimStatus">Pending</span>
+      </div>
+
+      <div class="selector-list" id="selectorList" aria-label="Selectors checked">
+        <button class="selector" type="button" data-selector="google">google</button>
+        <button class="selector" type="button" data-selector="selector1">selector1</button>
+        <button class="selector" type="button" data-selector="default">default</button>
+        <button class="selector" type="button" data-selector="mail">mail</button>
+        <button class="selector" type="button" data-selector="sendgrid">sendgrid</button>
+      </div>
+
+      <div class="dkim-records" id="dkimRecords">
+        <article>
+          <div class="record-minihead">Selectors pending</div>
+          <pre class="record-text compact">Checking common DKIM selectors...</pre>
+        </article>
+      </div>
+
+      <form class="selector-form" id="selectorForm">
+        <label for="selectorInput">Add selector</label>
+        <div>
+          <input id="selectorInput" name="selector" type="text" placeholder="for example: k2">
+          <button class="secondary-button" type="submit">Check</button>
+        </div>
+      </form>
+    </section>
+
+    <footer class="popup-footer">
+      <span id="timestamp">Checked locally</span>
+      <span id="copyState" aria-live="polite"></span>
+    </footer>
+  </main>
+
+  <script src="popup.js"></script>
+</body>
+</html>
