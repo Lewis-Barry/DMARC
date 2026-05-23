@@ -6,36 +6,28 @@ const refreshButton = document.querySelector("#refreshButton");
 const rootMode = document.querySelector("#rootMode");
 const hostMode = document.querySelector("#hostMode");
 const domainTitle = document.querySelector("#domainTitle");
-const spfName = document.querySelector("#spfName");
 const timestamp = document.querySelector("#timestamp");
 const selectorForm = document.querySelector("#selectorForm");
 const selectorInput = document.querySelector("#selectorInput");
 const selectorList = document.querySelector("#selectorList");
 const dkimRecords = document.querySelector("#dkimRecords");
 const dkimStatus = document.querySelector("#dkimStatus");
-const statusStrip = document.querySelector("#statusStrip");
 
 const fakeRecords = {
   root: {
     domain: "example.com",
-    spfName: "example.com",
-    checked: "Checked 2026-04-30 14:22",
-    status: "Records checked through Cloudflare DNS over HTTPS"
+    checked: "Checked 2026-04-30 14:22"
   },
   host: {
     domain: "www.example.com",
-    spfName: "www.example.com",
-    checked: "Checked 2026-04-30 14:23",
-    status: "Hostname records checked through Cloudflare DNS over HTTPS"
+    checked: "Checked 2026-04-30 14:23"
   }
 };
 
 function setMode(mode) {
   const data = fakeRecords[mode];
   domainTitle.textContent = data.domain;
-  spfName.textContent = data.spfName;
   timestamp.textContent = data.checked;
-  statusStrip.textContent = data.status;
   rootMode.classList.toggle("active", mode === "root");
   hostMode.classList.toggle("active", mode === "host");
 }
@@ -82,14 +74,11 @@ Cloudflare DNS over HTTPS`;
 
 function refreshRecords() {
   popup.classList.add("is-loading");
-  statusStrip.textContent = "Checking TXT records...";
+  timestamp.textContent = "Checking...";
   refreshButton.textContent = "...";
 
   window.setTimeout(() => {
     popup.classList.remove("is-loading");
-    statusStrip.textContent = rootMode.classList.contains("active")
-      ? fakeRecords.root.status
-      : fakeRecords.host.status;
     refreshButton.textContent = "↻";
     timestamp.textContent = "Checked 2026-04-30 14:24";
   }, 650);

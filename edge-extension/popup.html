@@ -9,22 +9,22 @@
 <body>
   <main class="popup" aria-label="DNS record inspector popup">
     <header class="popup-header">
-      <div>
+      <div class="popup-identity">
         <p class="eyebrow">Current site</p>
         <h1 id="domainTitle">Loading...</h1>
+        <p class="nameserver" id="nameserver">Checking nameservers...</p>
       </div>
       <div class="header-actions">
-        <button class="icon-button" id="refreshButton" type="button" aria-label="Refresh records">R</button>
-        <button class="primary-button" id="copyButton" type="button">Copy</button>
+        <div class="mode-row" aria-label="Lookup mode">
+          <button class="mode-button active" id="rootMode" type="button">Root</button>
+          <button class="mode-button" id="hostMode" type="button">Current</button>
+        </div>
+        <div class="action-row">
+          <button class="icon-button" id="refreshButton" type="button" aria-label="Refresh records">R</button>
+          <button class="primary-button" id="copyButton" type="button">Copy</button>
+        </div>
       </div>
     </header>
-
-    <div class="mode-row" aria-label="Lookup mode">
-      <button class="mode-button active" id="rootMode" type="button">Root domain</button>
-      <button class="mode-button" id="hostMode" type="button">Current hostname</button>
-    </div>
-
-    <div class="status-strip" id="statusStrip" role="status">Loading current tab...</div>
 
     <section class="record-section" aria-labelledby="spfTitle">
       <div class="section-heading">
@@ -32,11 +32,7 @@
         <span class="status-label neutral" id="spfStatus">Pending</span>
       </div>
       <pre class="record-text" id="spfRecord">Checking TXT records...</pre>
-      <dl class="facts-grid">
-        <div><dt>TXT name</dt><dd id="spfName">Loading...</dd></div>
-        <div><dt>All mechanism</dt><dd id="spfAll">Pending</dd></div>
-        <div><dt>Records found</dt><dd id="spfCount">Pending</dd></div>
-      </dl>
+      <ul class="issue-list" id="spfIssues"></ul>
     </section>
 
     <section class="record-section" aria-labelledby="dmarcTitle">
@@ -45,11 +41,7 @@
         <span class="status-label neutral" id="dmarcStatus">Pending</span>
       </div>
       <pre class="record-text" id="dmarcRecord">Checking TXT records...</pre>
-      <dl class="facts-grid">
-        <div><dt>Policy</dt><dd id="dmarcPolicy">Pending</dd></div>
-        <div><dt>Alignment</dt><dd id="dmarcAlignment">Pending</dd></div>
-        <div><dt>Reports</dt><dd id="dmarcReports">Pending</dd></div>
-      </dl>
+      <ul class="issue-list" id="dmarcIssues"></ul>
     </section>
 
     <section class="record-section" aria-labelledby="dkimTitle">
@@ -73,6 +65,11 @@
         </article>
       </div>
 
+      <div class="others-checked" id="othersChecked" hidden>
+        <p class="others-label">Others checked</p>
+        <div class="selector-list" id="otherSelectors"></div>
+      </div>
+
       <form class="selector-form" id="selectorForm">
         <label for="selectorInput">Add selector</label>
         <div>
@@ -83,7 +80,10 @@
     </section>
 
     <footer class="popup-footer">
-      <span id="timestamp">Checked locally</span>
+      <div class="footer-info">
+        <span id="timestamp">Loading current tab...</span>
+        <span class="footer-note" id="providerNote">Records checked through Cloudflare DNS over HTTPS</span>
+      </div>
       <span id="copyState" aria-live="polite"></span>
     </footer>
   </main>

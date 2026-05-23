@@ -32,61 +32,48 @@
 
       <aside class="popup" id="popup" aria-label="DNS record inspector popup">
         <header class="popup-header">
-          <div>
+          <div class="popup-identity">
             <p class="eyebrow">Current site</p>
             <h1 id="domainTitle">example.com</h1>
+            <p class="nameserver" id="nameserver">ns1.example.net, ns2.example.net</p>
           </div>
           <div class="header-actions">
-            <button class="icon-button" id="refreshButton" type="button" aria-label="Refresh records">↻</button>
-            <button class="primary-button" id="copyButton" type="button">Copy</button>
+            <div class="mode-row" aria-label="Lookup mode">
+              <button class="mode-button active" id="rootMode" type="button">Root</button>
+              <button class="mode-button" id="hostMode" type="button">Current</button>
+            </div>
+            <div class="action-row">
+              <button class="icon-button" id="refreshButton" type="button" aria-label="Refresh records">↻</button>
+              <button class="primary-button" id="copyButton" type="button">Copy</button>
+            </div>
           </div>
         </header>
-
-        <div class="mode-row" aria-label="Lookup mode">
-          <button class="mode-button active" id="rootMode" type="button">Root domain</button>
-          <button class="mode-button" id="hostMode" type="button">Current hostname</button>
-        </div>
-
-        <div class="status-strip" id="statusStrip" role="status">Records checked through Cloudflare DNS over HTTPS</div>
 
         <section class="record-section" aria-labelledby="spfTitle">
           <div class="section-heading">
             <h2 id="spfTitle">SPF</h2>
-            <span class="status-label found">Found</span>
+            <span class="status-label ok">Found</span>
           </div>
           <pre class="record-text">v=spf1 include:_spf.example.net include:mail.example.com -all</pre>
-          <dl class="facts-grid">
-            <div><dt>TXT name</dt><dd id="spfName">example.com</dd></div>
-            <div><dt>All mechanism</dt><dd>-all</dd></div>
-            <div><dt>Records found</dt><dd>1</dd></div>
-          </dl>
         </section>
 
         <section class="record-section" aria-labelledby="dmarcTitle">
           <div class="section-heading">
             <h2 id="dmarcTitle">DMARC</h2>
-            <span class="status-label found">Found</span>
+            <span class="status-label ok">Found</span>
           </div>
           <pre class="record-text">v=DMARC1; p=reject; rua=mailto:dmarc@example.com; adkim=s; aspf=r; pct=100</pre>
-          <dl class="facts-grid">
-            <div><dt>Policy</dt><dd>p=reject</dd></div>
-            <div><dt>Alignment</dt><dd>adkim=s, aspf=r</dd></div>
-            <div><dt>Reports</dt><dd>rua present</dd></div>
-          </dl>
         </section>
 
         <section class="record-section" aria-labelledby="dkimTitle">
           <div class="section-heading">
             <h2 id="dkimTitle">DKIM</h2>
-            <span class="status-label found" id="dkimStatus">2 found</span>
+            <span class="status-label ok" id="dkimStatus">2 found</span>
           </div>
 
-          <div class="selector-list" id="selectorList" aria-label="Selectors checked">
-            <button class="selector active" type="button" data-selector="google">google</button>
-            <button class="selector active" type="button" data-selector="selector1">selector1</button>
-            <button class="selector" type="button" data-selector="default">default</button>
-            <button class="selector" type="button" data-selector="mail">mail</button>
-            <button class="selector" type="button" data-selector="sendgrid">sendgrid</button>
+          <div class="selector-list" id="selectorList" aria-label="Selectors found">
+            <button class="selector ok" type="button" data-selector="google">google</button>
+            <button class="selector ok" type="button" data-selector="selector1">selector1</button>
           </div>
 
           <div class="dkim-records" id="dkimRecords">
@@ -100,6 +87,15 @@
             </article>
           </div>
 
+          <div class="others-checked" id="othersChecked">
+            <p class="others-label">Others checked</p>
+            <div class="selector-list" id="otherSelectors" aria-label="Selectors not found">
+              <span class="selector static">default</span>
+              <span class="selector static">mail</span>
+              <span class="selector static">sendgrid</span>
+            </div>
+          </div>
+
           <form class="selector-form" id="selectorForm">
             <label for="selectorInput">Add selector</label>
             <div>
@@ -110,7 +106,10 @@
         </section>
 
         <footer class="popup-footer">
-          <span id="timestamp">Checked 2026-04-30 14:22</span>
+          <div class="footer-info">
+            <span id="timestamp">Checked 2026-04-30 14:22</span>
+            <span class="footer-note">Records checked through Cloudflare DNS over HTTPS</span>
+          </div>
           <span id="copyState" aria-live="polite"></span>
         </footer>
       </aside>
