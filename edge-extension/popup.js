@@ -416,6 +416,7 @@ function validateSpf(records) {
   const tokens = records[0].trim().split(/\s+/).filter(Boolean);
   const mechanisms = tokens.slice(1);
   const allMech = mechanisms.find((m) => /^[+\-?~]?all$/i.test(m));
+  const redirectMech = mechanisms.find((m) => /^redirect=/i.test(m));
   const unknown = mechanisms.find((m) => !isValidSpfMechanism(m));
 
   if (unknown) {
@@ -429,16 +430,20 @@ function validateSpf(records) {
     } else if (qualifier === "?") {
       issues.push({ severity: "warn", pill: "Neutral policy", helper: "`?all` tells receivers to treat unauthenticated mail as neither pass nor fail." });
     }
-  } else {
-    issues.push({ severity: "warn", pill: "No fallback", helper: "Record has no terminal `all` mechanism — behaviour is undefined for non-matching senders." });
+  } else if (!redirectMech) {
+    issues.push({ severity: "warn", pill: "No fallback", helper: "Record has no terminal `all` mechanism or `redirect=` modifier — behaviour is undefined for non-matching senders." });
   }
 
   if (mechanisms.some((m) => /^[+\-?~]?ptr(:|$)/i.test(m))) {
     issues.push({ severity: "warn", pill: "Deprecated mechanism", helper: "`ptr` is deprecated (RFC 7208 §5.5) and ignored by many receivers." });
   }
 
-  if (mechanisms.some((m) => /^redirect=/i.test(m)) && allMech) {
-    issues.push({ severity: "warn", pill: "Conflicting directives", helper: "`redirect=` is ignored when `all` is also present." });
+  if (redirectMech && allMech) {
+    issues.push({
+      severity: "warn",
+      pill: "Unreachable redirect",
+      helper: "`redirect=` is a modifier that only runs after all mechanisms — but `all` always matches, so the redirect is never evaluated. Remove the `all` (or remove the `redirect=`) for it to take effect."
+    });
   }
 
   const lookupCount = mechanisms.filter((m) => /^[+\-?~]?(include:|a$|a[:/]|mx$|mx[:/]|exists:|ptr$|ptr:)|^redirect=/i.test(m)).length;
