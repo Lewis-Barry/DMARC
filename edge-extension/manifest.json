@@ -1,10 +1,10 @@
 {
   "manifest_version": 3,
-  "name": "DNS Auth Inspector",
+  "name": "Sendmaster",
   "version": "0.1.0",
   "description": "Shows SPF, DKIM, and DMARC records for the current site.",
   "action": {
-    "default_title": "DNS Auth Inspector",
+    "default_title": "Sendmaster",
     "default_popup": "popup.html"
   },
   "permissions": ["activeTab", "tabs", "storage"],

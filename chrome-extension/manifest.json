@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Sendmaster",
+  "short_name": "Sendmaster",
+  "version": "0.1.0",
+  "minimum_chrome_version": "88",
+  "description": "Check your domain's outbound mail authentication (SPF, DKIM, DMARC) with inline validation and a copy-friendly summary.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Sendmaster",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": [
+    "https://cloudflare-dns.com/*",
+    "https://dns.google/*"
+  ]
+}
