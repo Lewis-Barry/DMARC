@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Sendmaster",
   "short_name": "Sendmaster",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "minimum_chrome_version": "88",
   "description": "Check your domain's outbound mail authentication (SPF, DKIM, DMARC) with inline validation and a copy-friendly summary.",
   "icons": {
