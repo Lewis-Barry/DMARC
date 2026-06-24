@@ -415,12 +415,23 @@ function validateSpf(records) {
   const issues = [];
   const tokens = records[0].trim().split(/\s+/).filter(Boolean);
   const mechanisms = tokens.slice(1);
-  const allMech = mechanisms.find((m) => /^[+\-?~]?all$/i.test(m));
+  const allMechanisms = mechanisms.filter((m) => /^[+\-?~]?all$/i.test(m));
+  const allMech = allMechanisms[0];
+  const allIndex = mechanisms.findIndex((m) => /^[+\-?~]?all$/i.test(m));
   const redirectMech = mechanisms.find((m) => /^redirect=/i.test(m));
   const unknown = mechanisms.find((m) => !isValidSpfMechanism(m));
 
   if (unknown) {
     issues.push({ severity: "error", pill: "Syntax error", helper: `Unrecognized token: \`${unknown}\`.` });
+  }
+
+  if (allMechanisms.length > 1) {
+    issues.push({ severity: "error", pill: "Multiple all", helper: "SPF records should contain only one terminal `all` mechanism." });
+  }
+
+  if (allIndex !== -1 && allIndex < mechanisms.length - 1) {
+    const afterAll = mechanisms.slice(allIndex + 1).join(" ");
+    issues.push({ severity: "error", pill: "Misplaced all", helper: `\`${allMech}\` always matches, so mechanisms after it are unreachable: \`${afterAll}\`.` });
   }
 
   if (allMech) {
@@ -475,7 +486,8 @@ function parseTagRecord(record) {
   return { tags, counts, malformed };
 }
 
-const DMARC_KNOWN_TAGS = ["v", "p", "sp", "adkim", "aspf", "pct", "fo", "rf", "ri", "rua", "ruf"];
+const DMARC_KNOWN_TAGS = ["v", "p", "sp", "adkim", "aspf", "rua", "ruf", "fo", "pct", "rf", "ri", "np", "t", "psd"];
+const DMARC_REMOVED_TAGS = new Set(["pct", "rf", "ri"]);
 const DMARC_TYPOS = { rau: "rua", rauf: "ruf", rufa: "ruf", pcr: "pct", pcrt: "pct", polic: "p", polciy: "p", quar: "p", reject: "p" };
 
 function validateDmarc(records) {
@@ -493,8 +505,17 @@ function validateDmarc(records) {
     issues.push({ severity: "error", pill: "Syntax error", helper: `Tag \`${malformed[0]}\` isn't in name=value form.` });
   }
 
+  const firstTag = records[0].split(";").map((p) => p.trim()).filter(Boolean)[0] || "";
+  if (!/^v\s*=\s*DMARC1$/i.test(firstTag)) {
+    issues.push({ severity: "error", pill: "Invalid version", helper: "DMARC records must start with `v=DMARC1`." });
+  }
+
+  if (tags.has("v") && !/^dmarc1$/i.test(tags.get("v"))) {
+    issues.push({ severity: "error", pill: "Invalid version", helper: "`v=` must be `DMARC1`." });
+  }
+
   if (!tags.has("p")) {
-    issues.push({ severity: "error", pill: "Missing policy", helper: "Required `p=` tag is absent." });
+    issues.push({ severity: "warn", pill: "Missing policy", helper: "Recommended `p=` tag is absent; receivers default to `p=none`." });
   } else {
     const pVal = tags.get("p").toLowerCase();
     if (!["none", "quarantine", "reject"].includes(pVal)) {
@@ -513,7 +534,21 @@ function validateDmarc(records) {
     }
   }
 
-  const enumTags = { sp: ["none", "quarantine", "reject"], adkim: ["r", "s"], aspf: ["r", "s"] };
+  for (const tag of DMARC_REMOVED_TAGS) {
+    if (tags.has(tag)) {
+      issues.push({ severity: "warn", pill: "Removed tag", helper: `\`${tag}=\` was removed in RFC 9989 and should not be used in new DMARC records.` });
+    }
+  }
+
+  const enumTags = {
+    sp: ["none", "quarantine", "reject"],
+    adkim: ["r", "s"],
+    aspf: ["r", "s"],
+    np: ["none", "quarantine", "reject"],
+    t: ["y", "n"],
+    psd: ["y", "n", "u"],
+    rf: ["afrf"]
+  };
   for (const [tag, allowed] of Object.entries(enumTags)) {
     if (tags.has(tag) && !allowed.includes(tags.get(tag).toLowerCase())) {
       issues.push({ severity: "warn", pill: `Invalid ${tag}`, helper: `Allowed values for \`${tag}\`: ${allowed.join(", ")}.` });
@@ -527,13 +562,20 @@ function validateDmarc(records) {
     }
   }
 
+  if (tags.has("ri")) {
+    const ri = Number(tags.get("ri"));
+    if (!Number.isInteger(ri) || ri < 0) {
+      issues.push({ severity: "warn", pill: "Invalid ri", helper: "`ri=` must be a non-negative integer number of seconds." });
+    }
+  }
+
   for (const [tag] of counts) {
     if (!DMARC_KNOWN_TAGS.includes(tag)) {
       const suggestion = DMARC_TYPOS[tag];
       issues.push({
-        severity: "warn",
-        pill: "Unknown tag",
-        helper: suggestion ? `Unknown tag \`${tag}\` — did you mean \`${suggestion}\`?` : `Unknown tag \`${tag}\`.`
+        severity: "error",
+        pill: "Unsupported tag",
+        helper: suggestion ? `Unsupported DMARC tag \`${tag}\` — did you mean \`${suggestion}\`?` : `Unsupported DMARC tag \`${tag}\`.`
       });
     }
   }
